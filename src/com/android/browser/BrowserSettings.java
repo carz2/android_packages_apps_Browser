@@ -129,8 +129,6 @@ public class BrowserSettings implements OnSharedPreferenceChangeListener,
 
     private static String sFactoryResetUrl;
 
-    private static boolean sWebGLAvailable;
-
     public static void initialize(final Context context) {
         sInstance = new BrowserSettings(context);
     }
@@ -272,10 +270,6 @@ public class BrowserSettings implements OnSharedPreferenceChangeListener,
         settings.setSavePassword(rememberPasswords());
         settings.setSaveFormData(saveFormdata());
         settings.setUseWideViewPort(isWideViewport());
-        settings.setAutoFillProfile(getAutoFillProfile());
-        setIsWebGLAvailable(settings.isWebGLAvailable());
-        settings.setWebGLEnabled(isWebGLAvailable() && isWebGLEnabled());
-        settings.setWebSocketsEnabled(isWebSocketsEnabled());
 
         String ua = mCustomUserAgents.get(settings);
         if (ua != null) {
@@ -293,6 +287,7 @@ public class BrowserSettings implements OnSharedPreferenceChangeListener,
         settingsClassic.setDoubleTapZoom(getDoubleTapZoom());
         settingsClassic.setAutoFillEnabled(isAutofillEnabled());
         settingsClassic.setAutoFillProfile(getAutoFillProfile());
+        settingsClassic.setWebSocketsEnabled(isWebSocketsEnabled());
 
         boolean useInverted = useInvertedRendering();
         settingsClassic.setProperty(WebViewProperties.gfxInvertedScreen,
@@ -672,6 +667,10 @@ public class BrowserSettings implements OnSharedPreferenceChangeListener,
         return mPrefs.getString(PREF_SEARCH_ENGINE, SearchEngine.GOOGLE);
     }
 
+    public int getUserAgent() {
+        return Integer.parseInt(mPrefs.getString(PREF_USER_AGENT, "0"));
+    }
+
     public boolean allowAppTabs() {
         return mPrefs.getBoolean(PREF_ALLOW_APP_TABS, false);
     }
@@ -752,13 +751,6 @@ public class BrowserSettings implements OnSharedPreferenceChangeListener,
             return false;
         }
         return mPrefs.getBoolean(PREF_ENABLE_HARDWARE_ACCEL_SKIA, false);
-    }
-
-    public int getUserAgent() {
-        if (!isDebugEnabled()) {
-            return 0;
-        }
-        return Integer.parseInt(mPrefs.getString(PREF_USER_AGENT, "0"));
     }
 
     // -----------------------------
@@ -859,10 +851,6 @@ public class BrowserSettings implements OnSharedPreferenceChangeListener,
         return 1 + (mPrefs.getInt(PREF_INVERTED_CONTRAST, 0) / 10f);
     }
 
-    public boolean isWebGLEnabled() {
-        return mPrefs.getBoolean(PREF_ENABLE_WEBGL, true);
-    }
-
     public boolean isWebSocketsEnabled() {
         return mPrefs.getBoolean(PREF_ENABLE_WEBSOCKETS, false);
     }
@@ -942,14 +930,6 @@ public class BrowserSettings implements OnSharedPreferenceChangeListener,
 
     public String getLinkPrefetchEnabled() {
         return mPrefs.getString(PREF_LINK_PREFETCH, getDefaultLinkPrefetchSetting());
-    }
-
-    private static void setIsWebGLAvailable(boolean available) {
-        sWebGLAvailable = available;
-    }
-
-    public static boolean isWebGLAvailable() {
-        return sWebGLAvailable;
     }
 
     // -----------------------------
